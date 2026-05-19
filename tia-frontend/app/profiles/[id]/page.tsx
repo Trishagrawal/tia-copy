@@ -2,9 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getTiaProfiles, updateTiaProfile } from "@/lib/api";
-import Link from "next/link";
+import {
+  Button,
+  LoadingSpinner,
+  Alert,
+  useToast,
+  AppLayout,
+  PageHeader,
+  PageContainer,
+  Badge,
+  EmptyState,
+  Input,
+  TextArea,
+  Select,
+  Checkbox,
+} from "@/components";
+import { AlertCircle, Pencil, X, Check } from "lucide-react";
 
 interface TiaProfile {
   tia_profile_id: number;
@@ -17,11 +33,21 @@ interface TiaProfile {
   user_id: number;
 }
 
+const TONE_OPTIONS = [
+  { value: "formal", label: "Formal" },
+  { value: "casual", label: "Casual" },
+  { value: "encouraging", label: "Encouraging" },
+  { value: "critical", label: "Critical" },
+  { value: "humorous", label: "Humorous" },
+];
+
 export default function ProfileDetailPage() {
   const router = useRouter();
   const params = useParams();
   const profileId = parseInt(params.id as string);
   const { user, isLoading } = useAuth();
+  const { addToast } = useToast();
+
   const [profile, setProfile] = useState<TiaProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<TiaProfile>>({});
@@ -55,29 +81,21 @@ export default function ProfileDetailPage() {
     fetchProfile();
   }, [user, profileId]);
 
-  if (isLoading) {
-    return <div className="text-center py-8">Loading...</div>;
-  }
-
-  if (!user) {
-    return null;
-  }
-
   const handleSave = async () => {
-    setSaving(true);
-    setError("");
+    if (!user) return;
 
     if (!formData.name?.trim()) {
       setError("Profile name is required");
-      setSaving(false);
       return;
     }
 
     if (!formData.system_prompt?.trim()) {
       setError("System prompt is required");
-      setSaving(false);
       return;
     }
+
+    setSaving(true);
+    setError("");
 
     const response = await updateTiaProfile(user.user_id, profileId, {
       name: formData.name?.trim(),
@@ -90,6 +108,7 @@ export default function ProfileDetailPage() {
 
     if (response.error) {
       setError(response.error);
+      addToast(response.error, "error");
       setSaving(false);
       return;
     }
@@ -97,223 +116,193 @@ export default function ProfileDetailPage() {
     setProfile({ ...profile, ...formData } as TiaProfile);
     setIsEditing(false);
     setSaving(false);
+    addToast("Profile updated successfully", "success");
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
   if (loading) {
-    return <div className="text-center py-8">Loading profile...</div>;
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <LoadingSpinner size="lg" />
+        </div>
+      </AppLayout>
+    );
   }
 
   if (!profile) {
-    return <div className="text-center py-8 text-red-600">Profile not found</div>;
+    return (
+      <AppLayout>
+        <PageHeader title="Profile Not Found" backHref="/profiles" backLabel="Profiles" />
+        <PageContainer>
+          <EmptyState
+            icon={<AlertCircle className="h-7 w-7 text-muted-foreground" />}
+            title="Profile not found"
+            description="The profile you are looking for does not exist or has been deleted"
+            action={
+              <Link href="/profiles">
+                <Button variant="primary">Back to Profiles</Button>
+              </Link>
+            }
+          />
+        </PageContainer>
+      </AppLayout>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link href="/profiles" className="text-indigo-600 hover:text-indigo-700">
-            ← Back to Profiles
-          </Link>
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white rounded-lg shadow p-8">
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
-              {error}
+    <AppLayout>
+      <PageHeader
+        title={isEditing ? "Edit Profile" : profile.name}
+        backHref="/profiles"
+        backLabel="Profiles"
+        actions={
+          !isEditing && (
+            <div className="flex items-center gap-2">
+              {profile.is_default && <Badge variant="success">Default</Badge>}
+              <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
+                <Pencil className="h-4 w-4" />
+                Edit
+              </Button>
             </div>
-          )}
+          )
+        }
+      />
 
-          {isEditing ? (
-            <>
-              <h1 className="text-3xl font-bold text-gray-900 mb-8">
-                Edit Profile
-              </h1>
+      <PageContainer>
+        <div className="max-w-2xl">
+          <div className="card p-6 sm:p-8">
+            {error && (
+              <Alert
+                type="error"
+                message={error}
+                onClose={() => setError("")}
+                className="mb-6"
+              />
+            )}
 
+            {isEditing ? (
               <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Profile Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name || ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                <Input
+                  id="profile-name"
+                  label="Profile Name"
+                  value={formData.name || ""}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+
+                <Input
+                  id="profile-description"
+                  label="Description"
+                  value={formData.description || ""}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Brief description of this profile"
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <Select
+                    id="profile-tone"
+                    label="Tone"
+                    value={formData.tone || "formal"}
+                    onChange={(e) => setFormData({ ...formData, tone: e.target.value })}
+                    options={TONE_OPTIONS}
+                    required
+                  />
+
+                  <Input
+                    id="profile-expertise"
+                    label="Expertise Area"
+                    value={formData.expertise_area || ""}
+                    onChange={(e) => setFormData({ ...formData, expertise_area: e.target.value })}
+                    placeholder="e.g., Climate Science"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
-                    Description
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.description || ""}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
+                <TextArea
+                  id="profile-system"
+                  label="System Prompt"
+                  value={formData.system_prompt || ""}
+                  onChange={(e) => setFormData({ ...formData, system_prompt: e.target.value })}
+                  rows={8}
+                  required
+                />
 
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">
-                      Tone *
-                    </label>
-                    <select
-                      value={formData.tone || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, tone: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      <option value="formal">Formal</option>
-                      <option value="casual">Casual</option>
-                      <option value="encouraging">Encouraging</option>
-                      <option value="critical">Critical</option>
-                      <option value="humorous">Humorous</option>
-                    </select>
-                  </div>
+                <Checkbox
+                  id="profile-default"
+                  label="Set as default profile"
+                  checked={formData.is_default || false}
+                  onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
+                />
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">
-                      Expertise Area
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.expertise_area || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          expertise_area: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
-                    System Prompt *
-                  </label>
-                  <textarea
-                    value={formData.system_prompt || ""}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        system_prompt: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-sm"
-                    rows={8}
-                  />
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="isDefault"
-                    checked={formData.is_default || false}
-                    onChange={(e) =>
-                      setFormData({ ...formData, is_default: e.target.checked })
-                    }
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  />
-                  <label htmlFor="isDefault" className="ml-3 text-sm font-medium text-gray-900">
-                    Set as default profile
-                  </label>
-                </div>
-
-                <div className="flex gap-4 pt-6">
-                  <button
+                <div className="flex gap-3 pt-6 border-t border-border">
+                  <Button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded-lg transition"
+                    loading={saving}
+                    variant="primary"
                   >
-                    {saving ? "Saving..." : "Save Changes"}
-                  </button>
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-bold py-2 px-4 rounded-lg transition"
+                    <Check className="h-4 w-4" />
+                    Save Changes
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setFormData(profile);
+                      setError("");
+                    }}
+                    variant="ghost"
+                    disabled={saving}
                   >
+                    <X className="h-4 w-4" />
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </div>
-            </>
-          ) : (
-            <>
-              <div className="flex justify-between items-start mb-8">
+            ) : (
+              <div className="space-y-6">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">
-                    {profile.name}
-                  </h1>
-                  <p className="text-gray-600 mt-1">
-                    Tone: <span className="font-medium capitalize">{profile.tone}</span>
-                  </p>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Tone</p>
+                  <p className="text-foreground capitalize">{profile.tone}</p>
                 </div>
-                <div className="flex gap-2">
-                  {profile.is_default && (
-                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                      Default
-                    </span>
-                  )}
+
+                {profile.description && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Description</p>
+                    <p className="text-foreground">{profile.description}</p>
+                  </div>
+                )}
+
+                {profile.expertise_area && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Expertise Area</p>
+                    <p className="text-foreground">{profile.expertise_area}</p>
+                  </div>
+                )}
+
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-2">System Prompt</p>
+                  <div className="p-4 bg-secondary/50 rounded-lg border border-border">
+                    <p className="text-sm text-foreground whitespace-pre-wrap font-mono">
+                      {profile.system_prompt}
+                    </p>
+                  </div>
                 </div>
               </div>
-
-              {profile.description && (
-                <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                  <p className="text-gray-700">{profile.description}</p>
-                </div>
-              )}
-
-              {profile.expertise_area && (
-                <div className="mb-6">
-                  <p className="text-sm font-medium text-gray-900">
-                    Expertise Area:
-                  </p>
-                  <p className="text-sm text-gray-700 mt-1">
-                    {profile.expertise_area}
-                  </p>
-                </div>
-              )}
-
-              <div className="mb-6">
-                <p className="text-sm font-medium text-gray-900 mb-2">
-                  System Prompt:
-                </p>
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
-                    {profile.system_prompt}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                >
-                  Edit Profile
-                </button>
-                <Link
-                  href="/profiles"
-                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-900 rounded-lg hover:bg-gray-400 text-center"
-                >
-                  Back
-                </Link>
-              </div>
-            </>
-          )}
+            )}
+          </div>
         </div>
-      </main>
-    </div>
+      </PageContainer>
+    </AppLayout>
   );
 }

@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
+import { AlertCircle, ChevronDown } from "lucide-react";
 
-interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helperText?: string;
@@ -13,30 +13,27 @@ interface InputProps
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, helperText, required, className, ...props }, ref) => {
     const hasError = !!error;
-    const inputClassName = `
-      w-full px-4 py-2 border rounded-lg
-      transition-colors
-      focus:outline-none focus:ring-2 focus:ring-offset-0
-      disabled:bg-gray-100 disabled:cursor-not-allowed
-      ${
-        hasError
-          ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-          : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400"
-      }
-      ${className || ""}
-    `;
 
     return (
       <div>
         {label && (
-          <label className="block text-sm font-medium text-gray-900 mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             {label}
-            {required && <span className="text-red-600 ml-1">*</span>}
+            {required && <span className="text-destructive ml-1">*</span>}
           </label>
         )}
         <input
           ref={ref}
-          className={inputClassName}
+          className={`
+            w-full px-4 py-2.5 bg-card border rounded-lg text-foreground placeholder:text-muted-foreground
+            transition-all duration-200
+            focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:border-transparent
+            disabled:bg-muted disabled:cursor-not-allowed disabled:opacity-60
+            ${hasError 
+              ? "border-destructive focus:ring-destructive" 
+              : "border-input hover:border-muted-foreground/50"}
+            ${className || ""}
+          `}
           aria-invalid={hasError}
           aria-describedby={hasError ? `${props.id}-error` : undefined}
           {...props}
@@ -44,20 +41,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {error && (
           <p
             id={`${props.id}-error`}
-            className="text-xs text-red-600 mt-1 flex items-center gap-1"
+            className="text-xs text-destructive mt-1.5 flex items-center gap-1.5"
           >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <AlertCircle className="w-3.5 h-3.5" />
             {error}
           </p>
         )}
         {!error && helperText && (
-          <p className="text-xs text-gray-500 mt-1">{helperText}</p>
+          <p className="text-xs text-muted-foreground mt-1.5">{helperText}</p>
         )}
       </div>
     );
@@ -66,8 +57,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
 Input.displayName = "Input";
 
-interface TextAreaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   error?: string;
   helperText?: string;
@@ -77,31 +67,27 @@ interface TextAreaProps
 export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
   ({ label, error, helperText, required, className, ...props }, ref) => {
     const hasError = !!error;
-    const textareaClassName = `
-      w-full px-4 py-2 border rounded-lg
-      transition-colors
-      focus:outline-none focus:ring-2 focus:ring-offset-0
-      disabled:bg-gray-100 disabled:cursor-not-allowed
-      resize-vertical
-      ${
-        hasError
-          ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-          : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400"
-      }
-      ${className || ""}
-    `;
 
     return (
       <div>
         {label && (
-          <label className="block text-sm font-medium text-gray-900 mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             {label}
-            {required && <span className="text-red-600 ml-1">*</span>}
+            {required && <span className="text-destructive ml-1">*</span>}
           </label>
         )}
         <textarea
           ref={ref}
-          className={textareaClassName}
+          className={`
+            w-full px-4 py-2.5 bg-card border rounded-lg text-foreground placeholder:text-muted-foreground
+            transition-all duration-200 resize-y min-h-[100px]
+            focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:border-transparent
+            disabled:bg-muted disabled:cursor-not-allowed disabled:opacity-60
+            ${hasError 
+              ? "border-destructive focus:ring-destructive" 
+              : "border-input hover:border-muted-foreground/50"}
+            ${className || ""}
+          `}
           aria-invalid={hasError}
           aria-describedby={hasError ? `${props.id}-error` : undefined}
           {...props}
@@ -109,20 +95,14 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
         {error && (
           <p
             id={`${props.id}-error`}
-            className="text-xs text-red-600 mt-1 flex items-center gap-1"
+            className="text-xs text-destructive mt-1.5 flex items-center gap-1.5"
           >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <AlertCircle className="w-3.5 h-3.5" />
             {error}
           </p>
         )}
         {!error && helperText && (
-          <p className="text-xs text-gray-500 mt-1">{helperText}</p>
+          <p className="text-xs text-muted-foreground mt-1.5">{helperText}</p>
         )}
       </div>
     );
@@ -131,8 +111,7 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
 
 TextArea.displayName = "TextArea";
 
-interface SelectProps
-  extends React.SelectHTMLAttributes<HTMLSelectElement> {
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   helperText?: string;
@@ -141,71 +120,54 @@ interface SelectProps
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({
-    label,
-    error,
-    helperText,
-    required,
-    options,
-    className,
-    ...props
-  },
-  ref
-) => {
+  ({ label, error, helperText, required, options, className, ...props }, ref) => {
     const hasError = !!error;
-    const selectClassName = `
-      w-full px-4 py-2 border rounded-lg
-      transition-colors
-      focus:outline-none focus:ring-2 focus:ring-offset-0
-      disabled:bg-gray-100 disabled:cursor-not-allowed
-      bg-white
-      ${
-        hasError
-          ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-          : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400"
-      }
-      ${className || ""}
-    `;
 
     return (
       <div>
         {label && (
-          <label className="block text-sm font-medium text-gray-900 mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             {label}
-            {required && <span className="text-red-600 ml-1">*</span>}
+            {required && <span className="text-destructive ml-1">*</span>}
           </label>
         )}
-        <select
-          ref={ref}
-          className={selectClassName}
-          aria-invalid={hasError}
-          aria-describedby={hasError ? `${props.id}-error` : undefined}
-          {...props}
-        >
-          <option value="">Select an option</option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            ref={ref}
+            className={`
+              w-full px-4 py-2.5 bg-card border rounded-lg text-foreground appearance-none cursor-pointer
+              transition-all duration-200 pr-10
+              focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:border-transparent
+              disabled:bg-muted disabled:cursor-not-allowed disabled:opacity-60
+              ${hasError 
+                ? "border-destructive focus:ring-destructive" 
+                : "border-input hover:border-muted-foreground/50"}
+              ${className || ""}
+            `}
+            aria-invalid={hasError}
+            aria-describedby={hasError ? `${props.id}-error` : undefined}
+            {...props}
+          >
+            <option value="">Select an option</option>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+        </div>
         {error && (
           <p
             id={`${props.id}-error`}
-            className="text-xs text-red-600 mt-1 flex items-center gap-1"
+            className="text-xs text-destructive mt-1.5 flex items-center gap-1.5"
           >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <AlertCircle className="w-3.5 h-3.5" />
             {error}
           </p>
         )}
         {!error && helperText && (
-          <p className="text-xs text-gray-500 mt-1">{helperText}</p>
+          <p className="text-xs text-muted-foreground mt-1.5">{helperText}</p>
         )}
       </div>
     );
@@ -214,8 +176,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 
 Select.displayName = "Select";
 
-interface CheckboxProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
 }
@@ -223,39 +184,34 @@ interface CheckboxProps
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
   ({ label, error, className, ...props }, ref) => {
     const hasError = !!error;
+    
     return (
       <div>
-        <div className="flex items-center">
+        <label className="flex items-center gap-3 cursor-pointer group">
           <input
             ref={ref}
             type="checkbox"
             className={`
-              h-4 w-4 rounded
-              transition-colors
-              border-gray-300
-              focus:outline-none focus:ring-2 focus:ring-offset-0
-              focus:ring-indigo-500
+              h-5 w-5 rounded border-2 cursor-pointer
+              transition-all duration-200
+              border-input
+              checked:bg-primary checked:border-primary
+              focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
               disabled:opacity-50 disabled:cursor-not-allowed
-              ${hasError ? "border-red-300" : ""}
+              ${hasError ? "border-destructive" : ""}
               ${className || ""}
             `}
             {...props}
           />
           {label && (
-            <label className="ml-3 text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors">
               {label}
-            </label>
+            </span>
           )}
-        </div>
+        </label>
         {error && (
-          <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                clipRule="evenodd"
-              />
-            </svg>
+          <p className="text-xs text-destructive mt-1.5 flex items-center gap-1.5 ml-8">
+            <AlertCircle className="w-3.5 h-3.5" />
             {error}
           </p>
         )}

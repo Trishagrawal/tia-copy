@@ -5,7 +5,21 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getTiaProfiles, updateTiaProfile, deleteTiaProfile } from "@/lib/api";
-import { Alert, Button, Input, Select, TextArea, LoadingSpinner, useToast } from "@/components";
+import {
+  Alert,
+  Button,
+  Input,
+  Select,
+  TextArea,
+  LoadingSpinner,
+  useToast,
+  AppLayout,
+  PageHeader,
+  PageContainer,
+  EmptyState,
+  Badge,
+} from "@/components";
+import { UserCog, Plus, Pencil, Trash2, X, Check } from "lucide-react";
 
 interface TiaProfile {
   tia_profile_id: number;
@@ -43,6 +57,7 @@ export default function ProfilesPage() {
   const [profiles, setProfiles] = useState<TiaProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
   const [editData, setEditData] = useState<EditData>({
     name: "",
     description: "",
@@ -90,6 +105,7 @@ export default function ProfilesPage() {
       expertise_area: profile.expertise_area ?? "",
       is_default: profile.is_default,
     });
+    setError("");
   };
 
   const handleCancelEdit = () => {
@@ -119,6 +135,7 @@ export default function ProfilesPage() {
     }
 
     setError("");
+    setSaving(true);
 
     const response = await updateTiaProfile(user.user_id, profileId, {
       name: editData.name.trim(),
@@ -132,6 +149,7 @@ export default function ProfilesPage() {
     if (response.error) {
       setError(response.error);
       addToast(response.error, "error");
+      setSaving(false);
       return;
     }
 
@@ -151,6 +169,7 @@ export default function ProfilesPage() {
       )
     );
     setEditingId(null);
+    setSaving(false);
     addToast("Profile updated", "success");
   };
 
@@ -174,7 +193,7 @@ export default function ProfilesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -185,50 +204,48 @@ export default function ProfilesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700 font-medium">
-              ← Back to Dashboard
-            </Link>
-            <Link href="/profiles/new">
-              <Button type="button" variant="primary">
-                + New Profile
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+    <AppLayout>
+      <PageHeader
+        title="TIA Profiles"
+        description="Manage assistant personalities and prompts"
+        actions={
+          <Link href="/profiles/new">
+            <Button variant="primary">
+              <Plus className="h-4 w-4" />
+              New Profile
+            </Button>
+          </Link>
+        }
+      />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">TIA Profiles</h1>
-          <p className="mt-1 text-gray-600">Manage assistant personalities and prompts.</p>
-        </div>
-
+      <PageContainer>
         {error && (
           <Alert type="error" message={error} onClose={() => setError("")} className="mb-6" />
         )}
 
         {loading ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-10 flex justify-center">
+          <div className="card p-12 flex items-center justify-center">
             <LoadingSpinner />
           </div>
         ) : profiles.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <p className="font-medium text-gray-700">No profiles yet</p>
-            <p className="mt-2 text-sm text-gray-500">Create your first profile to customize TIA.</p>
-            <Link href="/profiles/new" className="inline-block mt-6">
-              <Button type="button" variant="primary">
-                Create your first profile
-              </Button>
-            </Link>
-          </div>
+          <EmptyState
+            icon={<UserCog className="h-7 w-7 text-muted-foreground" />}
+            title="No profiles yet"
+            description="Create your first TIA profile to customize how your assistant behaves"
+            action={
+              <Link href="/profiles/new">
+                <Button variant="primary">Create Your First Profile</Button>
+              </Link>
+            }
+          />
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {profiles.map((profile) => (
-              <div key={profile.tia_profile_id} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {profiles.map((profile, index) => (
+              <div
+                key={profile.tia_profile_id}
+                className="card p-6 animate-fade-in"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
                 {editingId === profile.tia_profile_id ? (
                   <div className="space-y-4">
                     <Input
@@ -265,75 +282,80 @@ export default function ProfilesPage() {
                       required
                     />
 
-                    <label className="flex items-center gap-3 text-sm font-medium text-gray-900">
+                    <label className="flex items-center gap-3 text-sm font-medium text-foreground cursor-pointer">
                       <input
                         type="checkbox"
                         checked={editData.is_default}
                         onChange={(e) => setEditData({ ...editData, is_default: e.target.checked })}
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        className="h-5 w-5 rounded border-2 border-input checked:bg-primary checked:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                       />
                       Set as default profile
                     </label>
 
                     <div className="flex gap-3 pt-2">
                       <Button
-                        type="button"
                         onClick={() => handleSave(profile.tia_profile_id)}
                         variant="primary"
-                        fullWidth
+                        disabled={saving}
+                        loading={saving}
                       >
+                        <Check className="h-4 w-4" />
                         Save
                       </Button>
-                      <Button type="button" onClick={handleCancelEdit} variant="secondary">
+                      <Button onClick={handleCancelEdit} variant="ghost" disabled={saving}>
+                        <X className="h-4 w-4" />
                         Cancel
                       </Button>
                     </div>
                   </div>
                 ) : (
                   <>
-                    <div className="mb-4 flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <h2 className="truncate text-lg font-semibold text-gray-900">{profile.name}</h2>
-                        <p className="mt-1 text-sm text-gray-600 capitalize">Tone: {profile.tone}</p>
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <div className="min-w-0 flex-1">
+                        <h2 className="text-lg font-semibold text-foreground truncate">
+                          {profile.name}
+                        </h2>
+                        <p className="text-sm text-muted-foreground capitalize mt-0.5">
+                          Tone: {profile.tone}
+                        </p>
                       </div>
-                      {profile.is_default && (
-                        <span className="whitespace-nowrap rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-                          Default
-                        </span>
-                      )}
+                      {profile.is_default && <Badge variant="success">Default</Badge>}
                     </div>
 
                     {profile.description && (
-                      <p className="mb-3 text-sm text-gray-600">{profile.description}</p>
+                      <p className="text-sm text-muted-foreground mb-3">{profile.description}</p>
                     )}
 
                     {profile.expertise_area && (
-                      <p className="mb-3 text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground mb-3">
                         <span className="font-medium">Expertise:</span> {profile.expertise_area}
                       </p>
                     )}
 
-                    <div className="mb-4 rounded border border-gray-200 bg-gray-50 p-3">
-                      <p className="mb-1 text-xs font-medium text-gray-600">System Prompt:</p>
-                      <p className="line-clamp-3 text-xs text-gray-700">{profile.system_prompt}</p>
+                    <div className="p-3 bg-secondary/50 rounded-lg border border-border mb-4">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">System Prompt</p>
+                      <p className="text-xs text-foreground line-clamp-3 font-mono">
+                        {profile.system_prompt}
+                      </p>
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                       <Button
-                        type="button"
                         onClick={() => handleEdit(profile)}
-                        variant="secondary"
-                        fullWidth
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
                       >
+                        <Pencil className="h-4 w-4" />
                         Edit
                       </Button>
                       <Button
-                        type="button"
                         onClick={() => handleDelete(profile.tia_profile_id)}
-                        variant="danger"
-                        fullWidth
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:bg-destructive/10"
                       >
-                        Delete
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </>
@@ -342,7 +364,7 @@ export default function ProfilesPage() {
             ))}
           </div>
         )}
-      </main>
-    </div>
+      </PageContainer>
+    </AppLayout>
   );
 }
