@@ -77,7 +77,14 @@ export default function NewProfilePage() {
     });
 
     if (response.error) {
-      setError(response.error);
+      // Provide more helpful error messages
+      if (response.status === 0) {
+        setError("Cannot connect to the backend server. Please ensure it's running on http://localhost:8000");
+      } else if (response.status === 401) {
+        setError("Session expired. Please log in again.");
+      } else {
+        setError(response.error);
+      }
       addToast(response.error, "error");
       setLoading(false);
       return;

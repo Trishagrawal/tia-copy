@@ -78,8 +78,14 @@ export default function DashboardPage() {
         setProjectsError("");
         const response = await getProjects();
         if (response.error) {
-          setProjectsError(response.error);
-          addToast(response.error, "error");
+          // Provide more helpful error messages based on status
+          if (response.status === 0) {
+            setProjectsError("Cannot connect to the backend server. Please ensure it's running on http://localhost:8000");
+          } else if (response.status === 401) {
+            setProjectsError("Session expired. Please log in again.");
+          } else {
+            setProjectsError(response.error);
+          }
         } else if (response.data) {
           setProjects(response.data);
         }
@@ -90,8 +96,13 @@ export default function DashboardPage() {
         setProfilesError("");
         const response = await getTiaProfiles(user.user_id);
         if (response.error) {
-          setProfilesError(response.error);
-          addToast(response.error, "error");
+          if (response.status === 0) {
+            setProfilesError("Cannot connect to the backend server.");
+          } else if (response.status === 401) {
+            setProfilesError("Session expired. Please log in again.");
+          } else {
+            setProfilesError(response.error);
+          }
         } else if (response.data) {
           setTiaProfiles(response.data);
         }
@@ -101,7 +112,7 @@ export default function DashboardPage() {
       fetchProjects();
       fetchProfiles();
     }
-  }, [user, addToast]);
+  }, [user]);
 
   if (isLoading) {
     return (
