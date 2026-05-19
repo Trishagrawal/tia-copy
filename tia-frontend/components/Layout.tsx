@@ -30,7 +30,7 @@ function NavLink({ href, icon, label, isActive, onClick }: NavLinkProps) {
     <Link
       href={href}
       onClick={onClick}
-      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+      className={`flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
         isActive
           ? "bg-primary text-primary-foreground shadow-sm"
           : "text-muted-foreground hover:bg-secondary hover:text-foreground"
@@ -62,18 +62,18 @@ export function Sidebar({ user, onLogout, mobileOpen, onMobileClose }: SidebarPr
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 py-5 border-b border-border">
-        <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-xl">
-          <Zap className="h-5 w-5 text-primary" />
+      <div className="flex items-center gap-3 px-4 py-6 border-b border-border">
+        <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-xl">
+          <Zap className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-lg font-bold text-foreground">TIA</h1>
-          <p className="text-xs text-muted-foreground">Research Assistant</p>
+          <h1 className="text-xl font-bold text-foreground">TIA</h1>
+          <p className="text-sm text-muted-foreground">Research Assistant</p>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-5 space-y-2 overflow-y-auto">
         {navItems.map((item) => (
           <NavLink
             key={item.href}
@@ -87,14 +87,14 @@ export function Sidebar({ user, onLogout, mobileOpen, onMobileClose }: SidebarPr
       {/* User Section */}
       <div className="border-t border-border p-4">
         <div className="flex items-center gap-3 mb-4">
-          <div className="flex items-center justify-center w-10 h-10 bg-secondary rounded-full text-sm font-semibold text-secondary-foreground">
+          <div className="flex items-center justify-center w-12 h-12 bg-secondary rounded-full text-base font-semibold text-secondary-foreground">
             {user.first_name.charAt(0)}{user.last_name.charAt(0)}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">
+            <p className="text-base font-medium text-foreground truncate">
               {user.first_name} {user.last_name}
             </p>
-            <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
+            <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
           </div>
         </div>
         <Button
@@ -104,7 +104,7 @@ export function Sidebar({ user, onLogout, mobileOpen, onMobileClose }: SidebarPr
           fullWidth
           className="justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
         >
-          <LogOut className="h-4 w-4 mr-2" />
+          <LogOut className="h-5 w-5 mr-2" />
           Sign Out
         </Button>
       </div>
@@ -159,7 +159,7 @@ export function PageHeader({
 }: PageHeaderProps) {
   return (
     <header className="sticky top-0 z-30 bg-card/80 glass border-b border-border">
-      <div className="px-4 sm:px-6 lg:px-8 py-4">
+      <div className="px-4 sm:px-6 lg:px-8 py-5">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 min-w-0">
             {onMenuClick && (
@@ -167,26 +167,26 @@ export function PageHeader({
                 onClick={onMenuClick}
                 className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-secondary"
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="h-6 w-6" />
               </button>
             )}
             
             {backHref && (
               <Link
                 href={backHref}
-                className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                className="flex items-center gap-1 text-base font-medium text-muted-foreground hover:text-primary transition-colors"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-5 w-5" />
                 <span className="hidden sm:inline">{backLabel || "Back"}</span>
               </Link>
             )}
             
             <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate text-balance">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground truncate text-balance">
                 {title}
               </h1>
               {description && (
-                <p className="text-sm text-muted-foreground mt-0.5 hidden sm:block">
+                <p className="text-base text-muted-foreground mt-1 hidden sm:block">
                   {description}
                 </p>
               )}
@@ -244,15 +244,15 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
-    <div className="card p-8 sm:p-12 text-center animate-fade-in">
+    <div className="card p-10 sm:p-14 text-center animate-fade-in">
       {icon && (
-        <div className="flex items-center justify-center w-14 h-14 bg-secondary rounded-2xl mx-auto mb-4">
+        <div className="flex items-center justify-center w-16 h-16 bg-secondary rounded-2xl mx-auto mb-5">
           {icon}
         </div>
       )}
-      <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
+      <h3 className="text-xl font-semibold text-foreground mb-3">{title}</h3>
       {description && (
-        <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
+        <p className="text-base text-muted-foreground mb-6 max-w-sm mx-auto">
           {description}
         </p>
       )}
@@ -270,19 +270,19 @@ interface StatCardProps {
 
 export function StatCard({ label, value, icon, trend }: StatCardProps) {
   return (
-    <div className="card p-5">
+    <div className="card p-6">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-muted-foreground">{label}</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{value}</p>
+          <p className="text-base font-medium text-muted-foreground">{label}</p>
+          <p className="text-3xl font-bold text-foreground mt-1">{value}</p>
           {trend && (
-            <p className={`text-xs mt-1 ${trend.positive ? "text-success" : "text-destructive"}`}>
+            <p className={`text-sm mt-1 ${trend.positive ? "text-success" : "text-destructive"}`}>
               {trend.positive ? "+" : ""}{trend.value}% from last month
             </p>
           )}
         </div>
         {icon && (
-          <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-xl text-primary">
+          <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-xl text-primary">
             {icon}
           </div>
         )}
@@ -309,7 +309,7 @@ export function Badge({ children, variant = "default", className = "" }: BadgePr
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${variants[variant]} ${className}`}
+      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${variants[variant]} ${className}`}
     >
       {children}
     </span>
@@ -318,7 +318,7 @@ export function Badge({ children, variant = "default", className = "" }: BadgePr
 
 export function PageContainer({ children }: { children: React.ReactNode }) {
   return (
-    <main className="px-4 sm:px-6 lg:px-8 py-6 lg:py-8 max-w-7xl mx-auto">
+    <main className="px-4 sm:px-6 lg:px-8 py-6 lg:py-10 max-w-7xl mx-auto">
       {children}
     </main>
   );

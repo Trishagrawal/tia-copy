@@ -94,6 +94,11 @@ export async function apiCall<T>(
     }
 
     if (!response.ok) {
+      // Handle 401 - clear token if it's invalid
+      if (response.status === 401 && typeof window !== "undefined") {
+        localStorage.removeItem("token");
+      }
+
       const errorMessage = getErrorMessage(
         response.status,
         data,
@@ -112,8 +117,13 @@ export async function apiCall<T>(
       status: response.status,
     };
   } catch (err) {
+    // Check if it's a network error (backend unreachable)
     const errorMessage =
-      err instanceof Error ? err.message : "Network error. Please try again.";
+      err instanceof Error 
+        ? err.message.includes("fetch") || err.message.includes("Failed") || err.message.includes("NetworkError")
+          ? "Unable to connect to the server. Please check your connection and try again."
+          : err.message 
+        : "Network error. Please try again.";
 
     return {
       error: errorMessage,

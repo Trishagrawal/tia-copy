@@ -41,15 +41,15 @@ export function Alert({
 
   return (
     <div
-      className={`rounded-xl border p-4 flex gap-3 items-start animate-fade-in ${styles[type]} ${className}`}
+      className={`rounded-xl border p-4 lg:p-5 flex gap-3 items-start animate-fade-in ${styles[type]} ${className}`}
       role="alert"
     >
       <div className={`shrink-0 mt-0.5 ${iconStyles[type]}`}>
         {icons[type]}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm">{message}</p>
-        {details && <p className="text-xs mt-1 opacity-80">{details}</p>}
+        <p className="font-medium text-base">{message}</p>
+        {details && <p className="text-sm mt-1 opacity-80">{details}</p>}
       </div>
       {onClose && (
         <button
@@ -57,7 +57,7 @@ export function Alert({
           className="shrink-0 p-1 rounded-lg hover:bg-black/5 transition-colors"
           aria-label="Close alert"
         >
-          <X className="w-4 h-4 opacity-60" />
+          <X className="w-5 h-5 opacity-60" />
         </button>
       )}
     </div>
@@ -72,8 +72,8 @@ interface InputErrorProps {
 export function InputError({ error, className = "" }: InputErrorProps) {
   if (!error) return null;
   return (
-    <p className={`text-xs text-destructive mt-1.5 flex items-center gap-1.5 ${className}`}>
-      <AlertCircle className="w-3.5 h-3.5" />
+    <p className={`text-sm text-destructive mt-2 flex items-center gap-1.5 ${className}`}>
+      <AlertCircle className="w-4 h-4" />
       {error}
     </p>
   );
@@ -96,14 +96,14 @@ export function FormField({
 }: FormFieldProps) {
   return (
     <div>
-      <label className="block text-sm font-medium text-foreground mb-2">
+      <label className="block text-base font-medium text-foreground mb-2">
         {label}
         {required && <span className="text-destructive ml-1">*</span>}
       </label>
       {children}
       {error && <InputError error={error} />}
       {!error && helperText && (
-        <p className="text-xs text-muted-foreground mt-1.5">{helperText}</p>
+        <p className="text-sm text-muted-foreground mt-2">{helperText}</p>
       )}
     </div>
   );

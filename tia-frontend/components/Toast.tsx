@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useContext, createContext } from "react";
+import React, { useState, useCallback, useContext, createContext, useRef } from "react";
 import { CheckCircle, AlertCircle, AlertTriangle, Info, X } from "lucide-react";
 
 export type ToastType = "success" | "error" | "warning" | "info";
@@ -22,6 +22,7 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const toastIdCounter = useRef(0);
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -29,7 +30,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const addToast = useCallback(
     (message: string, type: ToastType, duration = 5000) => {
-      const id = Date.now().toString();
+      toastIdCounter.current += 1;
+      const id = `toast-${Date.now()}-${toastIdCounter.current}`;
       const toast: Toast = { id, message, type, duration };
 
       setToasts((prev) => [...prev, toast]);
@@ -85,23 +87,23 @@ function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-md pointer-events-none">
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-3 max-w-md pointer-events-none">
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`flex items-start gap-3 rounded-xl border p-4 shadow-lg pointer-events-auto animate-slide-in-right ${styles[toast.type]}`}
+          className={`flex items-start gap-3 rounded-xl border p-4 lg:p-5 shadow-lg pointer-events-auto animate-slide-in-right ${styles[toast.type]}`}
           role="alert"
         >
           <div className={`shrink-0 mt-0.5 ${iconStyles[toast.type]}`}>
             {icons[toast.type]}
           </div>
-          <p className="flex-1 text-sm font-medium">{toast.message}</p>
+          <p className="flex-1 text-base font-medium">{toast.message}</p>
           <button
             onClick={() => onRemove(toast.id)}
             className="shrink-0 p-1 rounded-lg hover:bg-black/5 transition-colors"
             aria-label="Close notification"
           >
-            <X className="w-4 h-4 opacity-60" />
+            <X className="w-5 h-5 opacity-60" />
           </button>
         </div>
       ))}

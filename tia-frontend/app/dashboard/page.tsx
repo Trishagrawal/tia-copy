@@ -125,56 +125,56 @@ export default function DashboardPage() {
 
       <PageContainer>
         {/* Stats Overview */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="card p-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-10">
+          <div className="card p-5 lg:p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Projects</p>
-                <p className="text-2xl font-bold text-foreground mt-1">
+                <p className="text-sm lg:text-base font-medium text-muted-foreground">Projects</p>
+                <p className="text-2xl lg:text-3xl font-bold text-foreground mt-1">
                   {projectsLoading ? "-" : projects.length}
                 </p>
               </div>
-              <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-xl">
-                <FolderKanban className="h-5 w-5 text-primary" />
+              <div className="flex items-center justify-center w-11 h-11 lg:w-12 lg:h-12 bg-primary/10 rounded-xl">
+                <FolderKanban className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
               </div>
             </div>
           </div>
 
-          <div className="card p-5">
+          <div className="card p-5 lg:p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Active</p>
-                <p className="text-2xl font-bold text-foreground mt-1">
+                <p className="text-sm lg:text-base font-medium text-muted-foreground">Active</p>
+                <p className="text-2xl lg:text-3xl font-bold text-foreground mt-1">
                   {projectsLoading
                     ? "-"
                     : projects.filter((p) => p.status === "in_progress" || p.status === "planning").length}
                 </p>
               </div>
-              <div className="flex items-center justify-center w-10 h-10 bg-emerald-50 rounded-xl">
-                <Sparkles className="h-5 w-5 text-emerald-600" />
+              <div className="flex items-center justify-center w-11 h-11 lg:w-12 lg:h-12 bg-emerald-50 rounded-xl">
+                <Sparkles className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-600" />
               </div>
             </div>
           </div>
 
-          <div className="card p-5">
+          <div className="card p-5 lg:p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">TIA Profiles</p>
-                <p className="text-2xl font-bold text-foreground mt-1">
+                <p className="text-sm lg:text-base font-medium text-muted-foreground">TIA Profiles</p>
+                <p className="text-2xl lg:text-3xl font-bold text-foreground mt-1">
                   {profilesLoading ? "-" : tiaProfiles.length}
                 </p>
               </div>
-              <div className="flex items-center justify-center w-10 h-10 bg-violet-50 rounded-xl">
-                <UserCog className="h-5 w-5 text-violet-600" />
+              <div className="flex items-center justify-center w-11 h-11 lg:w-12 lg:h-12 bg-violet-50 rounded-xl">
+                <UserCog className="h-5 w-5 lg:h-6 lg:w-6 text-violet-600" />
               </div>
             </div>
           </div>
 
-          <div className="card p-5">
+          <div className="card p-5 lg:p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Due Soon</p>
-                <p className="text-2xl font-bold text-foreground mt-1">
+                <p className="text-sm lg:text-base font-medium text-muted-foreground">Due Soon</p>
+                <p className="text-2xl lg:text-3xl font-bold text-foreground mt-1">
                   {projectsLoading
                     ? "-"
                     : projects.filter((p) => {
@@ -186,18 +186,18 @@ export default function DashboardPage() {
                       }).length}
                 </p>
               </div>
-              <div className="flex items-center justify-center w-10 h-10 bg-amber-50 rounded-xl">
-                <Calendar className="h-5 w-5 text-amber-600" />
+              <div className="flex items-center justify-center w-11 h-11 lg:w-12 lg:h-12 bg-amber-50 rounded-xl">
+                <Calendar className="h-5 w-5 lg:h-6 lg:w-6 text-amber-600" />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Projects Column */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-foreground">Recent Projects</h2>
+              <h2 className="text-lg lg:text-xl font-semibold text-foreground">Recent Projects</h2>
               <Link href="/projects/new">
                 <Button variant="primary" size="sm">
                   <Plus className="h-4 w-4" />
@@ -220,7 +220,7 @@ export default function DashboardPage() {
               </div>
             ) : projects.length === 0 ? (
               <EmptyState
-                icon={<FolderKanban className="h-7 w-7 text-muted-foreground" />}
+                icon={<FolderKanban className="h-8 w-8 text-muted-foreground" />}
                 title="No projects yet"
                 description="Create your first project to start collaborating with TIA"
                 action={
@@ -230,7 +230,7 @@ export default function DashboardPage() {
                 }
               />
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {projects.slice(0, 5).map((project, index) => (
                   <Link
                     key={project.project_id}
@@ -238,24 +238,24 @@ export default function DashboardPage() {
                     className="block"
                   >
                     <div
-                      className="card card-hover p-5 animate-fade-in"
+                      className="card card-hover p-5 lg:p-6 animate-fade-in"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                          <h3 className="font-semibold text-base lg:text-lg text-foreground truncate group-hover:text-primary transition-colors">
                             {project.title}
                           </h3>
                           {project.description && (
-                            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                            <p className="text-sm lg:text-base text-muted-foreground mt-1.5 line-clamp-2">
                               {project.description}
                             </p>
                           )}
-                          <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-3 mt-3 text-sm text-muted-foreground">
                             {project.course_code && <span>{project.course_code}</span>}
                             {project.main_deadline && (
                               <span className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
+                                <Calendar className="h-3.5 w-3.5" />
                                 Due {new Date(project.main_deadline).toLocaleDateString()}
                               </span>
                             )}
@@ -271,8 +271,8 @@ export default function DashboardPage() {
 
                 {projects.length > 5 && (
                   <Link href="/projects" className="block">
-                    <div className="card p-4 text-center hover:bg-secondary/50 transition-colors">
-                      <span className="text-sm font-medium text-primary flex items-center justify-center gap-1">
+                    <div className="card p-4 lg:p-5 text-center hover:bg-secondary/50 transition-colors">
+                      <span className="text-base font-medium text-primary flex items-center justify-center gap-1">
                         View all {projects.length} projects
                         <ArrowRight className="h-4 w-4" />
                       </span>
@@ -288,7 +288,7 @@ export default function DashboardPage() {
             {/* TIA Profiles */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-foreground">TIA Profiles</h2>
+                <h2 className="text-lg lg:text-xl font-semibold text-foreground">TIA Profiles</h2>
                 <Link href="/profiles/new">
                   <Button variant="ghost" size="sm">
                     <Plus className="h-4 w-4" />
@@ -311,7 +311,7 @@ export default function DashboardPage() {
                 </div>
               ) : tiaProfiles.length === 0 ? (
                 <EmptyState
-                  icon={<UserCog className="h-6 w-6 text-muted-foreground" />}
+                  icon={<UserCog className="h-7 w-7 text-muted-foreground" />}
                   title="No profiles yet"
                   description="Create a TIA profile to customize your assistant"
                   action={
@@ -321,19 +321,19 @@ export default function DashboardPage() {
                   }
                 />
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {tiaProfiles.slice(0, 4).map((profile) => (
                     <Link
                       key={profile.tia_profile_id}
                       href={`/profiles/${profile.tia_profile_id}`}
                     >
-                      <div className="card card-hover p-4">
+                      <div className="card card-hover p-4 lg:p-5">
                         <div className="flex items-center justify-between">
                           <div className="min-w-0">
-                            <h3 className="font-medium text-foreground truncate">
+                            <h3 className="font-medium text-base text-foreground truncate">
                               {profile.name}
                             </h3>
-                            <p className="text-xs text-muted-foreground capitalize mt-0.5">
+                            <p className="text-sm text-muted-foreground capitalize mt-0.5">
                               {profile.tone}
                             </p>
                           </div>
@@ -350,28 +350,28 @@ export default function DashboardPage() {
 
             {/* Quick Links */}
             <div>
-              <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
-              <div className="space-y-2">
+              <h2 className="text-lg lg:text-xl font-semibold text-foreground mb-4">Quick Actions</h2>
+              <div className="space-y-3">
                 <Link href="/conversations">
-                  <div className="card card-hover p-4 flex items-center gap-3">
-                    <div className="flex items-center justify-center w-9 h-9 bg-primary/10 rounded-lg">
+                  <div className="card card-hover p-4 lg:p-5 flex items-center gap-4">
+                    <div className="flex items-center justify-center w-11 h-11 bg-primary/10 rounded-lg">
                       <MessageSquare className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">Conversations</p>
-                      <p className="text-xs text-muted-foreground">Chat with TIA</p>
+                      <p className="font-medium text-base text-foreground">Conversations</p>
+                      <p className="text-sm text-muted-foreground">Chat with TIA</p>
                     </div>
                   </div>
                 </Link>
 
                 <Link href="/profiles">
-                  <div className="card card-hover p-4 flex items-center gap-3">
-                    <div className="flex items-center justify-center w-9 h-9 bg-violet-50 rounded-lg">
+                  <div className="card card-hover p-4 lg:p-5 flex items-center gap-4">
+                    <div className="flex items-center justify-center w-11 h-11 bg-violet-50 rounded-lg">
                       <UserCog className="h-5 w-5 text-violet-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">Manage Profiles</p>
-                      <p className="text-xs text-muted-foreground">Customize TIA</p>
+                      <p className="font-medium text-base text-foreground">Manage Profiles</p>
+                      <p className="text-sm text-muted-foreground">Customize TIA</p>
                     </div>
                   </div>
                 </Link>
