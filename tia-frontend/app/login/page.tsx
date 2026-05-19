@@ -180,10 +180,10 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-2 mb-8">
-            <h2 className="text-2xl font-bold text-foreground">
+            <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
               {isLogin ? "Welcome back" : "Create your account"}
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               {isLogin
                 ? "Sign in to continue your research journey"
                 : "Start collaborating with TIA today"}
@@ -341,7 +341,7 @@ export default function LoginPage() {
 
           <div className="mt-8 pt-6 border-t border-border text-center">
             {isLogin ? (
-              <p className="text-muted-foreground">
+              <p className="text-base text-muted-foreground">
                 {"Don't have an account? "}
                 <button
                   type="button"
@@ -356,7 +356,7 @@ export default function LoginPage() {
                 </button>
               </p>
             ) : (
-              <p className="text-muted-foreground">
+              <p className="text-base text-muted-foreground">
                 Already have an account?{" "}
                 <button
                   type="button"

@@ -37,7 +37,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (response.data) {
           setUser(response.data);
         } else {
+          // Token is invalid or expired - clear it
           localStorage.removeItem("token");
+          setUser(null);
         }
       }
       setIsLoading(false);

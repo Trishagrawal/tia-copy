@@ -17,7 +17,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div>
         {label && (
-          <label className="block text-sm font-medium text-foreground mb-2">
+          <label className="block text-base font-medium text-foreground mb-2">
             {label}
             {required && <span className="text-destructive ml-1">*</span>}
           </label>
@@ -25,7 +25,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           className={`
-            w-full px-4 py-2.5 bg-card border rounded-lg text-foreground placeholder:text-muted-foreground
+            w-full px-4 py-3 bg-card border rounded-lg text-base text-foreground placeholder:text-muted-foreground
             transition-all duration-200
             focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:border-transparent
             disabled:bg-muted disabled:cursor-not-allowed disabled:opacity-60
@@ -41,14 +41,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {error && (
           <p
             id={`${props.id}-error`}
-            className="text-xs text-destructive mt-1.5 flex items-center gap-1.5"
+            className="text-sm text-destructive mt-2 flex items-center gap-1.5"
           >
-            <AlertCircle className="w-3.5 h-3.5" />
+            <AlertCircle className="w-4 h-4" />
             {error}
           </p>
         )}
         {!error && helperText && (
-          <p className="text-xs text-muted-foreground mt-1.5">{helperText}</p>
+          <p className="text-sm text-muted-foreground mt-2">{helperText}</p>
         )}
       </div>
     );
@@ -71,7 +71,7 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
     return (
       <div>
         {label && (
-          <label className="block text-sm font-medium text-foreground mb-2">
+          <label className="block text-base font-medium text-foreground mb-2">
             {label}
             {required && <span className="text-destructive ml-1">*</span>}
           </label>
@@ -79,8 +79,8 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
         <textarea
           ref={ref}
           className={`
-            w-full px-4 py-2.5 bg-card border rounded-lg text-foreground placeholder:text-muted-foreground
-            transition-all duration-200 resize-y min-h-[100px]
+            w-full px-4 py-3 bg-card border rounded-lg text-base text-foreground placeholder:text-muted-foreground
+            transition-all duration-200 resize-y min-h-[120px]
             focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:border-transparent
             disabled:bg-muted disabled:cursor-not-allowed disabled:opacity-60
             ${hasError 
@@ -95,14 +95,14 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
         {error && (
           <p
             id={`${props.id}-error`}
-            className="text-xs text-destructive mt-1.5 flex items-center gap-1.5"
+            className="text-sm text-destructive mt-2 flex items-center gap-1.5"
           >
-            <AlertCircle className="w-3.5 h-3.5" />
+            <AlertCircle className="w-4 h-4" />
             {error}
           </p>
         )}
         {!error && helperText && (
-          <p className="text-xs text-muted-foreground mt-1.5">{helperText}</p>
+          <p className="text-sm text-muted-foreground mt-2">{helperText}</p>
         )}
       </div>
     );
@@ -126,7 +126,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div>
         {label && (
-          <label className="block text-sm font-medium text-foreground mb-2">
+          <label className="block text-base font-medium text-foreground mb-2">
             {label}
             {required && <span className="text-destructive ml-1">*</span>}
           </label>
@@ -135,7 +135,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           <select
             ref={ref}
             className={`
-              w-full px-4 py-2.5 bg-card border rounded-lg text-foreground appearance-none cursor-pointer
+              w-full px-4 py-3 bg-card border rounded-lg text-base text-foreground appearance-none cursor-pointer
               transition-all duration-200 pr-10
               focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:border-transparent
               disabled:bg-muted disabled:cursor-not-allowed disabled:opacity-60
@@ -160,14 +160,14 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         {error && (
           <p
             id={`${props.id}-error`}
-            className="text-xs text-destructive mt-1.5 flex items-center gap-1.5"
+            className="text-sm text-destructive mt-2 flex items-center gap-1.5"
           >
-            <AlertCircle className="w-3.5 h-3.5" />
+            <AlertCircle className="w-4 h-4" />
             {error}
           </p>
         )}
         {!error && helperText && (
-          <p className="text-xs text-muted-foreground mt-1.5">{helperText}</p>
+          <p className="text-sm text-muted-foreground mt-2">{helperText}</p>
         )}
       </div>
     );
