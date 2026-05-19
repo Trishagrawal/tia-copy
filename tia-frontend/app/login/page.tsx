@@ -4,13 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { User, useAuth } from "@/context/AuthContext";
 import { login, createUser, getCurrentUser } from "@/lib/api";
-import {
-  Input,
-  Select,
-  Button,
-  Alert,
-  useToast,
-} from "@/components";
+import { Input, Select, Button, Alert, useToast } from "@/components";
+import { Zap, ArrowRight } from "lucide-react";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -108,7 +103,6 @@ export default function LoginPage() {
       return;
     }
 
-    // Auto-login after signup
     const loginResponse = await login(email, password);
     if (loginResponse.data?.access_token) {
       setToken(loginResponse.data.access_token);
@@ -128,33 +122,74 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-blue-50 py-12 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-lg mb-3">
-              <svg
-                className="w-6 h-6 text-indigo-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
+    <div className="min-h-screen flex">
+      {/* Left Panel - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-violet-700" />
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-white rounded-full blur-3xl" />
+        </div>
+        
+        <div className="relative z-10 flex flex-col justify-between p-12 text-white">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-xl backdrop-blur">
+              <Zap className="h-6 w-6" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">TIA</h1>
-            <p className="text-sm text-gray-600 mt-1">
-              The Innovative Assistant
+            <span className="text-2xl font-bold">TIA</span>
+          </div>
+          
+          <div className="space-y-6">
+            <h1 className="text-4xl xl:text-5xl font-bold leading-tight text-balance">
+              Your AI-Powered Research Assistant
+            </h1>
+            <p className="text-lg text-white/80 max-w-md leading-relaxed">
+              Collaborate with TIA to enhance your academic research, writing, and critical thinking in the Liberal Arts.
+            </p>
+            
+            <div className="flex items-center gap-4 pt-4">
+              <div className="flex -space-x-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="w-10 h-10 rounded-full bg-white/20 border-2 border-white/30 backdrop-blur"
+                  />
+                ))}
+              </div>
+              <p className="text-sm text-white/70">
+                Trusted by 1,000+ students and researchers
+              </p>
+            </div>
+          </div>
+          
+          <p className="text-sm text-white/50">
+            The Innovative Assistant for Liberal Arts
+          </p>
+        </div>
+      </div>
+
+      {/* Right Panel - Auth Form */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-background">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
+            <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-xl">
+              <Zap className="h-6 w-6 text-primary" />
+            </div>
+            <span className="text-2xl font-bold text-foreground">TIA</span>
+          </div>
+
+          <div className="space-y-2 mb-8">
+            <h2 className="text-2xl font-bold text-foreground">
+              {isLogin ? "Welcome back" : "Create your account"}
+            </h2>
+            <p className="text-muted-foreground">
+              {isLogin
+                ? "Sign in to continue your research journey"
+                : "Start collaborating with TIA today"}
             </p>
           </div>
 
-          {/* Error Alert */}
           {error && (
             <Alert
               type="error"
@@ -165,13 +200,12 @@ export default function LoginPage() {
           )}
 
           {isLogin ? (
-            // Login Form
             <form onSubmit={handleLogin} className="space-y-5">
               <Input
                 id="login-email"
                 label="Email Address"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="you@university.edu"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -185,12 +219,11 @@ export default function LoginPage() {
                 id="login-password"
                 label="Password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
-                  if (errors.password)
-                    setErrors({ ...errors, password: "" });
+                  if (errors.password) setErrors({ ...errors, password: "" });
                 }}
                 error={errors.password}
                 required
@@ -202,13 +235,14 @@ export default function LoginPage() {
                 loading={loading}
                 variant="primary"
                 fullWidth
-                className="mt-6"
+                size="lg"
+                className="mt-2"
               >
                 {loading ? "Signing in..." : "Sign In"}
+                {!loading && <ArrowRight className="w-4 h-4" />}
               </Button>
             </form>
           ) : (
-            // Signup Form
             <form onSubmit={handleSignup} className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <Input
@@ -219,8 +253,7 @@ export default function LoginPage() {
                   value={firstName}
                   onChange={(e) => {
                     setFirstName(e.target.value);
-                    if (errors.firstName)
-                      setErrors({ ...errors, firstName: "" });
+                    if (errors.firstName) setErrors({ ...errors, firstName: "" });
                   }}
                   error={errors.firstName}
                   required
@@ -233,8 +266,7 @@ export default function LoginPage() {
                   value={lastName}
                   onChange={(e) => {
                     setLastName(e.target.value);
-                    if (errors.lastName)
-                      setErrors({ ...errors, lastName: "" });
+                    if (errors.lastName) setErrors({ ...errors, lastName: "" });
                   }}
                   error={errors.lastName}
                   required
@@ -245,7 +277,7 @@ export default function LoginPage() {
                 id="signup-email"
                 label="Email Address"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="you@university.edu"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -255,42 +287,40 @@ export default function LoginPage() {
                 required
               />
 
-              <Select
-                id="signup-role"
-                label="Role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                options={[
-                  { value: "student", label: "Student" },
-                  { value: "faculty", label: "Faculty" },
-                ]}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <Select
+                  id="signup-role"
+                  label="Role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  options={[
+                    { value: "student", label: "Student" },
+                    { value: "faculty", label: "Faculty" },
+                  ]}
+                />
 
-              <Input
-                id="signup-department"
-                label="Department (Optional)"
-                type="text"
-                placeholder="e.g., Liberal Arts"
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                helperText="Your academic department"
-              />
+                <Input
+                  id="signup-department"
+                  label="Department"
+                  type="text"
+                  placeholder="Liberal Arts"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                />
+              </div>
 
               <Input
                 id="signup-password"
                 label="Password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="Create a password"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
-                  if (errors.password)
-                    setErrors({ ...errors, password: "" });
+                  if (errors.password) setErrors({ ...errors, password: "" });
                 }}
                 error={errors.password}
-                helperText={
-                  !errors.password ? "At least 6 characters" : undefined
-                }
+                helperText={!errors.password ? "At least 6 characters" : undefined}
                 required
               />
 
@@ -300,18 +330,19 @@ export default function LoginPage() {
                 loading={loading}
                 variant="primary"
                 fullWidth
-                className="mt-6"
+                size="lg"
+                className="mt-2"
               >
                 {loading ? "Creating account..." : "Create Account"}
+                {!loading && <ArrowRight className="w-4 h-4" />}
               </Button>
             </form>
           )}
 
-          {/* Toggle Form */}
-          <div className="mt-6 text-center border-t border-gray-200 pt-6">
+          <div className="mt-8 pt-6 border-t border-border text-center">
             {isLogin ? (
-              <p className="text-gray-600 text-sm">
-                Don&apos;t have an account?{" "}
+              <p className="text-muted-foreground">
+                {"Don't have an account? "}
                 <button
                   type="button"
                   onClick={() => {
@@ -319,13 +350,13 @@ export default function LoginPage() {
                     setError("");
                     setErrors({});
                   }}
-                  className="text-indigo-600 font-semibold hover:text-indigo-700 transition"
+                  className="text-primary font-semibold hover:underline transition"
                 >
                   Create one
                 </button>
               </p>
             ) : (
-              <p className="text-gray-600 text-sm">
+              <p className="text-muted-foreground">
                 Already have an account?{" "}
                 <button
                   type="button"
@@ -334,7 +365,7 @@ export default function LoginPage() {
                     setError("");
                     setErrors({});
                   }}
-                  className="text-indigo-600 font-semibold hover:text-indigo-700 transition"
+                  className="text-primary font-semibold hover:underline transition"
                 >
                   Sign in
                 </button>
@@ -342,11 +373,6 @@ export default function LoginPage() {
             )}
           </div>
         </div>
-
-        {/* Footer */}
-        <p className="text-center text-gray-500 text-xs mt-6">
-          By continuing, you agree to our Terms of Service and Privacy Policy
-        </p>
       </div>
     </div>
   );

@@ -10,7 +10,19 @@ import {
   getProjects,
   createConversation,
 } from "@/lib/api";
-import { Alert, Button, LoadingSpinner, Select, Input, useToast } from "@/components";
+import {
+  Alert,
+  Button,
+  LoadingSpinner,
+  Select,
+  Input,
+  useToast,
+  AppLayout,
+  PageHeader,
+  PageContainer,
+  EmptyState,
+} from "@/components";
+import { MessageSquare, Plus, X, ArrowRight } from "lucide-react";
 
 interface Conversation {
   conversation_id: number;
@@ -138,7 +150,7 @@ export default function ConversationsPage() {
       return;
     }
 
-    setNewConvError("Conversation created but no conversation id was returned.");
+    setNewConvError("Conversation created but no ID was returned");
     setCreatingConv(false);
   };
 
@@ -150,11 +162,8 @@ export default function ConversationsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="text-center">
-          <LoadingSpinner size="lg" />
-          <p className="mt-4 text-gray-600">Loading conversations...</p>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
@@ -164,88 +173,92 @@ export default function ConversationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700 font-medium">
-            ← Back to Dashboard
-          </Link>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col gap-6 lg:grid lg:grid-cols-3">
-          <section className="lg:col-span-2">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Conversations</h1>
-                <p className="text-gray-600 mt-1">
-                  Continue existing chats or start a new discussion with TIA.
-                </p>
-              </div>
-              <Button
-                type="button"
-                onClick={() => setShowNewForm((value) => !value)}
-                variant="primary"
-              >
-                {showNewForm ? "Hide Form" : "+ New Conversation"}
-              </Button>
-            </div>
-
-            {loading ? (
-              <div className="bg-white rounded-xl border border-gray-200 p-10 flex justify-center">
-                <LoadingSpinner />
-              </div>
+    <AppLayout>
+      <PageHeader
+        title="Conversations"
+        description="Continue chats or start a new discussion with TIA"
+        actions={
+          <Button
+            onClick={() => setShowNewForm(!showNewForm)}
+            variant={showNewForm ? "outline" : "primary"}
+          >
+            {showNewForm ? (
+              <>
+                <X className="h-4 w-4" />
+                Close
+              </>
             ) : (
               <>
-                {activeConversations.length === 0 ? (
-                  <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-                    <p className="text-gray-700 font-medium">No active conversations yet</p>
-                    <p className="text-gray-500 text-sm mt-2">Create one to start working with TIA.</p>
-                    <Button
-                      type="button"
-                      onClick={() => setShowNewForm(true)}
-                      variant="primary"
-                      className="mt-6"
-                    >
-                      Start a conversation
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {activeConversations.map((conversation) => (
-                      <Link
-                        key={conversation.conversation_id}
-                        href={`/conversations/${conversation.conversation_id}`}
-                        className="block"
-                      >
-                        <article className="bg-white rounded-xl border border-gray-200 p-4 hover:border-indigo-200 hover:shadow-md transition">
-                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                            <div className="min-w-0">
-                              <h2 className="font-semibold text-gray-900 truncate">
-                                {conversation.title}
-                              </h2>
-                              <p className="text-xs text-gray-500 mt-1">
-                                {getProjectName(conversation.project_id)} • {getProfileName(conversation.tia_profile_id)}
-                              </p>
-                            </div>
-                            <span className="text-xs text-gray-500 whitespace-nowrap">
-                              {new Date(conversation.created_at).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </article>
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                <Plus className="h-4 w-4" />
+                New Conversation
               </>
             )}
-          </section>
+          </Button>
+        }
+      />
 
-          <aside className="lg:col-span-1">
+      <PageContainer>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Conversations List */}
+          <div className="lg:col-span-2">
+            {loading ? (
+              <div className="card p-12 flex items-center justify-center">
+                <LoadingSpinner />
+              </div>
+            ) : activeConversations.length === 0 ? (
+              <EmptyState
+                icon={<MessageSquare className="h-7 w-7 text-muted-foreground" />}
+                title="No conversations yet"
+                description="Start a conversation with TIA to get help with your research"
+                action={
+                  <Button onClick={() => setShowNewForm(true)} variant="primary">
+                    Start a Conversation
+                  </Button>
+                }
+              />
+            ) : (
+              <div className="space-y-3">
+                {activeConversations.map((conversation, index) => (
+                  <Link
+                    key={conversation.conversation_id}
+                    href={`/conversations/${conversation.conversation_id}`}
+                    className="block"
+                  >
+                    <article
+                      className="card card-hover p-5 animate-fade-in"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <h2 className="font-semibold text-foreground truncate">
+                            {conversation.title}
+                          </h2>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {getProjectName(conversation.project_id)} &bull;{" "}
+                            {getProfileName(conversation.tia_profile_id)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(conversation.created_at).toLocaleDateString()}
+                          </span>
+                          <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </div>
+                    </article>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* New Conversation Form */}
+          <div>
             {showNewForm && (
-              <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm sticky top-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Start New Conversation</h2>
+              <div className="card p-6 animate-fade-in sticky top-24">
+                <h2 className="text-lg font-semibold text-foreground mb-4">
+                  Start New Conversation
+                </h2>
 
                 {newConvError && (
                   <Alert
@@ -261,7 +274,7 @@ export default function ConversationsPage() {
                     id="conversation-title"
                     label="Title"
                     type="text"
-                    placeholder="e.g. Research methodology"
+                    placeholder="e.g., Research methodology discussion"
                     value={newConvTitle}
                     onChange={(e) => setNewConvTitle(e.target.value)}
                     required
@@ -301,30 +314,30 @@ export default function ConversationsPage() {
                     >
                       {creatingConv ? "Starting..." : "Start Conversation"}
                     </Button>
-                    <Button
-                      type="button"
-                      onClick={() => setShowNewForm(false)}
-                      variant="secondary"
-                    >
-                      Cancel
-                    </Button>
                   </div>
                 </form>
               </div>
             )}
 
             {!showNewForm && (
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-2">Quick Actions</h2>
-                <p className="text-sm text-gray-600 mb-4">Create a new conversation from a project page or expand this panel.</p>
-                <Button type="button" onClick={() => setShowNewForm(true)} variant="primary" fullWidth>
-                  Open New Conversation Form
+              <div className="card p-6">
+                <h2 className="font-semibold text-foreground mb-2">Quick Actions</h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Start a new conversation or open the form above
+                </p>
+                <Button
+                  onClick={() => setShowNewForm(true)}
+                  variant="primary"
+                  fullWidth
+                >
+                  <Plus className="h-4 w-4" />
+                  New Conversation
                 </Button>
               </div>
             )}
-          </aside>
+          </div>
         </div>
-      </main>
-    </div>
+      </PageContainer>
+    </AppLayout>
   );
 }

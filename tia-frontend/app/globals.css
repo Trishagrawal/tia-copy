@@ -1,91 +1,119 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* Color System - Professional Blues with warm accents */
+  --color-background: #f8fafc;
+  --color-foreground: #0f172a;
+  --color-card: #ffffff;
+  --color-card-foreground: #1e293b;
+  
+  --color-primary: #4f46e5;
+  --color-primary-foreground: #ffffff;
+  --color-primary-hover: #4338ca;
+  
+  --color-secondary: #f1f5f9;
+  --color-secondary-foreground: #475569;
+  --color-secondary-hover: #e2e8f0;
+  
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  
+  --color-accent: #ddd6fe;
+  --color-accent-foreground: #5b21b6;
+  
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  
+  --color-border: #e2e8f0;
+  --color-input: #e2e8f0;
+  --color-ring: #4f46e5;
+  
+  /* Status colors */
+  --color-success: #10b981;
+  --color-success-foreground: #ffffff;
+  --color-warning: #f59e0b;
+  --color-warning-foreground: #ffffff;
+  --color-info: #3b82f6;
+  --color-info-foreground: #ffffff;
+  
+  /* Typography */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
 
 @layer base {
-  :root {
-    --background: #ffffff;
-    --foreground: #171717;
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-border);
   }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --background: #0a0a0a;
-      --foreground: #ededed;
-    }
-  }
-
+  
   html {
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-
+  
   body {
-    background: #f9fafb;
-    color: #111827;
-    font-family: var(--font-geist-sans), system-ui, sans-serif;
-  }
-
-  * {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-    transition-duration: 200ms;
-    transition-timing-function: ease;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
   }
 }
 
 @layer components {
-  .input-focus {
-    outline: none;
-    border-color: transparent;
-    box-shadow: 0 0 0 2px rgb(99 102 241);
-  }
-
-  .btn-base {
-    font-weight: 500;
-    border-radius: 0.5rem;
-    transition-property: all;
-    transition-duration: 200ms;
-    transition-timing-function: ease;
-  }
-
-  .btn-base:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .btn-base:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgb(99 102 241);
-  }
-
+  /* Card styles */
   .card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
-    transition-property: box-shadow;
-    transition-duration: 200ms;
-    transition-timing-function: ease;
+    background-color: var(--color-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   }
-
-  .card:hover {
-    box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+  
+  .card-hover {
+    transition: all 0.2s ease;
   }
-
-  .form-group {
-    display: grid;
-    gap: 0.5rem;
+  
+  .card-hover:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    border-color: var(--color-primary);
   }
-
-  .section-header {
-    font-size: 1.5rem;
-    line-height: 2rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 1.5rem;
+  
+  /* Focus ring */
+  .focus-ring {
+    outline: none;
+  }
+  
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+  
+  /* Glass effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 }
 
 @layer utilities {
+  /* Animations */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
   @keyframes fade-in-up {
     from {
       opacity: 0;
@@ -96,34 +124,91 @@
       transform: translateY(0);
     }
   }
-
-  @keyframes fade-out-down {
+  
+  @keyframes fade-in-down {
     from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
       opacity: 1;
       transform: translateY(0);
     }
-    to {
+  }
+  
+  @keyframes slide-in-right {
+    from {
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
     }
   }
-
+  
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+  
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+  
   .animate-fade-in-up {
-    animation: fade-in-up 0.3s ease-out;
+    animation: fade-in-up 0.4s ease-out;
   }
-
-  .animate-fade-out-down {
-    animation: fade-out-down 0.3s ease-out;
+  
+  .animate-fade-in-down {
+    animation: fade-in-down 0.4s ease-out;
   }
-
-  .truncate-lines {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  
+  .animate-slide-in-right {
+    animation: slide-in-right 0.4s ease-out;
   }
-
+  
+  .animate-pulse-subtle {
+    animation: pulse-subtle 2s ease-in-out infinite;
+  }
+  
+  /* Text utilities */
   .text-balance {
     text-wrap: balance;
+  }
+  
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-primary) 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Scrollbar styling */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted-foreground);
   }
 }

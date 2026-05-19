@@ -182,7 +182,7 @@ export async function createUser(userData: {
   department?: string;
   rit_id?: string;
 }): Promise<ApiResponse<unknown>> {
-  return apiCall("/api/users/", {
+  return apiCall("/api/users", {
     method: "POST",
     body: JSON.stringify(userData),
   });
@@ -191,7 +191,7 @@ export async function createUser(userData: {
 export async function getTiaProfiles(
   userId: number
 ): Promise<ApiResponse<never[]>> {
-  return apiCall(`/api/users/${userId}/tia-profiles/`);
+  return apiCall(`/api/users/${userId}/tia-profiles`);
 }
 
 export async function createTiaProfile(
@@ -205,7 +205,7 @@ export async function createTiaProfile(
     is_default?: boolean;
   }
 ): Promise<ApiResponse<never>> {
-  return apiCall(`/api/users/${userId}/tia-profiles/`, {
+  return apiCall(`/api/users/${userId}/tia-profiles`, {
     method: "POST",
     body: JSON.stringify(profileData),
   });
@@ -239,7 +239,7 @@ export async function deleteTiaProfile(
 }
 
 export async function getProjects(): Promise<ApiResponse<never[]>> {
-  return apiCall("/api/projects/");
+  return apiCall("/api/projects");
 }
 
 export async function getProject(projectId: number): Promise<ApiResponse<never>> {
@@ -254,7 +254,7 @@ export async function createProject(projectData: {
   status: string;
   main_deadline?: string;
 }): Promise<ApiResponse<unknown>> {
-  return apiCall("/api/projects/", {
+  return apiCall("/api/projects", {
     method: "POST",
     body: JSON.stringify({
       ...projectData,
@@ -290,7 +290,7 @@ export async function deleteProject(projectId: number): Promise<ApiResponse<unkn
 }
 
 export async function getTasks(projectId: number): Promise<ApiResponse<never[]>> {
-  return apiCall(`/api/projects/${projectId}/tasks/`);
+  return apiCall(`/api/projects/${projectId}/tasks`);
 }
 
 export async function createTask<T = never>(
@@ -304,7 +304,7 @@ export async function createTask<T = never>(
     estimated_minutes?: number;
   }
 ): Promise<ApiResponse<T>> {
-  return apiCall(`/api/projects/${projectId}/tasks/`, {
+  return apiCall(`/api/projects/${projectId}/tasks`, {
     method: "POST",
     body: JSON.stringify({
       ...taskData,
@@ -315,7 +315,7 @@ export async function createTask<T = never>(
 }
 
 export async function getConversations(): Promise<ApiResponse<never[]>> {
-  return apiCall("/api/conversations/");
+  return apiCall("/api/conversations");
 }
 
 export async function createConversation(conversationData: {
@@ -323,7 +323,7 @@ export async function createConversation(conversationData: {
   tia_profile_id: number;
   title: string;
 }): Promise<ApiResponse<{ conversation_id?: number }>> {
-  return apiCall("/api/conversations/", {
+  return apiCall("/api/conversations", {
     method: "POST",
     body: JSON.stringify(conversationData),
   });
@@ -338,7 +338,7 @@ export async function getConversation(
 export async function getMessages(
   conversationId: number
 ): Promise<ApiResponse<never[]>> {
-  return apiCall(`/api/conversations/${conversationId}/messages/`);
+  return apiCall(`/api/conversations/${conversationId}/messages`);
 }
 
 export async function sendMessage<T = never>(
@@ -349,7 +349,7 @@ export async function sendMessage<T = never>(
     message_role?: string;
   }
 ): Promise<ApiResponse<T>> {
-  return apiCall(`/api/conversations/${conversationId}/messages/`, {
+  return apiCall(`/api/conversations/${conversationId}/messages`, {
     method: "POST",
     body: JSON.stringify({
       ...messageData,

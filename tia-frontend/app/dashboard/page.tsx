@@ -2,10 +2,29 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getProjects, getTiaProfiles } from "@/lib/api";
-import { Button, LoadingSpinner, Alert, useToast } from "@/components";
-import Link from "next/link";
+import {
+  Button,
+  LoadingSpinner,
+  Alert,
+  useToast,
+  AppLayout,
+  PageHeader,
+  PageContainer,
+  EmptyState,
+  Badge,
+} from "@/components";
+import {
+  FolderKanban,
+  Plus,
+  Calendar,
+  MessageSquare,
+  UserCog,
+  ArrowRight,
+  Sparkles,
+} from "lucide-react";
 
 interface Project {
   project_id: number;
@@ -24,18 +43,29 @@ interface TiaProfile {
   is_default: boolean;
 }
 
+const STATUS_VARIANTS: Record<string, "success" | "warning" | "info" | "secondary" | "default"> = {
+  active: "success",
+  in_progress: "success",
+  planning: "info",
+  submitted: "info",
+  completed: "success",
+  archived: "secondary",
+};
+
+const formatStatus = (status: string) =>
+  status.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
   const { addToast } = useToast();
-  
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [tiaProfiles, setTiaProfiles] = useState<TiaProfile[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [profilesLoading, setProfilesLoading] = useState(true);
   const [projectsError, setProjectsError] = useState("");
   const [profilesError, setProfilesError] = useState("");
-
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/login");
@@ -73,15 +103,9 @@ export default function DashboardPage() {
     }
   }, [user, addToast]);
 
-  const handleLogout = () => {
-    logout();
-    addToast("Logged out successfully", "success");
-    router.push("/login");
-  };
-
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -91,88 +115,93 @@ export default function DashboardPage() {
     return null;
   }
 
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case "active":
-      case "in_progress":
-        return "bg-green-100 text-green-700 border border-green-200";
-      case "planning":
-        return "bg-purple-100 text-purple-700 border border-purple-200";
-      case "submitted":
-        return "bg-indigo-100 text-indigo-700 border border-indigo-200";
-      case "completed":
-        return "bg-blue-100 text-blue-700 border border-blue-200";
-      case "archived":
-        return "bg-gray-100 text-gray-700 border border-gray-200";
-      default:
-        return "bg-gray-100 text-gray-700 border border-gray-200";
-    }
-  };
-
-  const formatStatus = (status: string) =>
-    status.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="flex items-center gap-3">
-                <div className="inline-flex items-center justify-center w-10 h-10 bg-indigo-100 rounded-lg">
-                  <svg
-                    className="w-6 h-6 text-indigo-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">TIA</h1>
-                  <p className="text-xs text-gray-600">
-                    The Innovative Assistant
-                  </p>
-                </div>
+    <AppLayout>
+      <PageHeader
+        title={`Welcome back, ${user.first_name}`}
+        description="Here&apos;s an overview of your research activity"
+
+      />
+
+      <PageContainer>
+        {/* Stats Overview */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="card p-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Projects</p>
+                <p className="text-2xl font-bold text-foreground mt-1">
+                  {projectsLoading ? "-" : projects.length}
+                </p>
+              </div>
+              <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-xl">
+                <FolderKanban className="h-5 w-5 text-primary" />
               </div>
             </div>
-            <div className="flex items-center gap-6">
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">
-                  {user.first_name} {user.last_name}
+          </div>
+
+          <div className="card p-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Active</p>
+                <p className="text-2xl font-bold text-foreground mt-1">
+                  {projectsLoading
+                    ? "-"
+                    : projects.filter((p) => p.status === "in_progress" || p.status === "planning").length}
                 </p>
-                <p className="text-xs text-gray-500 capitalize">{user.role}</p>
               </div>
-              <Button
-                onClick={handleLogout}
-                variant="danger"
-                size="sm"
-                className="px-4 py-2"
-              >
-                Logout
-              </Button>
+              <div className="flex items-center justify-center w-10 h-10 bg-emerald-50 rounded-xl">
+                <Sparkles className="h-5 w-5 text-emerald-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="card p-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">TIA Profiles</p>
+                <p className="text-2xl font-bold text-foreground mt-1">
+                  {profilesLoading ? "-" : tiaProfiles.length}
+                </p>
+              </div>
+              <div className="flex items-center justify-center w-10 h-10 bg-violet-50 rounded-xl">
+                <UserCog className="h-5 w-5 text-violet-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="card p-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Due Soon</p>
+                <p className="text-2xl font-bold text-foreground mt-1">
+                  {projectsLoading
+                    ? "-"
+                    : projects.filter((p) => {
+                        if (!p.main_deadline) return false;
+                        const deadline = new Date(p.main_deadline);
+                        const now = new Date();
+                        const diff = deadline.getTime() - now.getTime();
+                        return diff > 0 && diff < 7 * 24 * 60 * 60 * 1000;
+                      }).length}
+                </p>
+              </div>
+              <div className="flex items-center justify-center w-10 h-10 bg-amber-50 rounded-xl">
+                <Calendar className="h-5 w-5 text-amber-600" />
+              </div>
             </div>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Projects Column */}
-          <div className="lg:col-span-2">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">My Projects</h2>
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-foreground">Recent Projects</h2>
               <Link href="/projects/new">
                 <Button variant="primary" size="sm">
-                  + New Project
+                  <Plus className="h-4 w-4" />
+                  New Project
                 </Button>
               </Link>
             </div>
@@ -182,206 +211,175 @@ export default function DashboardPage() {
                 type="error"
                 message={projectsError}
                 onClose={() => setProjectsError("")}
-                className="mb-6"
               />
             )}
 
             {projectsLoading ? (
-              <div className="flex items-center justify-center py-12">
+              <div className="card p-12 flex items-center justify-center">
                 <LoadingSpinner />
               </div>
             ) : projects.length === 0 ? (
-              <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-                <svg
-                  className="w-12 h-12 text-gray-400 mx-auto mb-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <p className="text-gray-600 font-medium mb-4">No projects yet</p>
-                <p className="text-gray-500 text-sm mb-6">
-                  Create your first project to get started
-                </p>
-                <Link href="/projects/new">
-                  <Button variant="primary">Create Your First Project</Button>
-                </Link>
-              </div>
+              <EmptyState
+                icon={<FolderKanban className="h-7 w-7 text-muted-foreground" />}
+                title="No projects yet"
+                description="Create your first project to start collaborating with TIA"
+                action={
+                  <Link href="/projects/new">
+                    <Button variant="primary">Create Your First Project</Button>
+                  </Link>
+                }
+              />
             ) : (
-              <div className="space-y-4">
-                {projects.map((project) => (
+              <div className="space-y-3">
+                {projects.slice(0, 5).map((project, index) => (
                   <Link
                     key={project.project_id}
                     href={`/projects/${project.project_id}`}
+                    className="block"
                   >
-                    <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-indigo-200 transition cursor-pointer group">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition">
+                    <div
+                      className="card card-hover p-5 animate-fade-in"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
                             {project.title}
                           </h3>
                           {project.description && (
-                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                               {project.description}
                             </p>
                           )}
+                          <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
+                            {project.course_code && <span>{project.course_code}</span>}
+                            {project.main_deadline && (
+                              <span className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                Due {new Date(project.main_deadline).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ml-4 ${getStatusBadgeColor(
-                            project.status
-                          )}`}
-                        >
+                        <Badge variant={STATUS_VARIANTS[project.status] || "secondary"}>
                           {formatStatus(project.status)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-gray-500 mt-4">
-                        {project.course_code && (
-                          <span className="text-gray-500">{project.course_code}</span>
-                        )}
-                        {project.main_deadline && (
-                          <span>
-                            Due:{" "}
-                            {new Date(project.main_deadline).toLocaleDateString()}
-                          </span>
-                        )}
+                        </Badge>
                       </div>
                     </div>
                   </Link>
                 ))}
+
+                {projects.length > 5 && (
+                  <Link href="/projects" className="block">
+                    <div className="card p-4 text-center hover:bg-secondary/50 transition-colors">
+                      <span className="text-sm font-medium text-primary flex items-center justify-center gap-1">
+                        View all {projects.length} projects
+                        <ArrowRight className="h-4 w-4" />
+                      </span>
+                    </div>
+                  </Link>
+                )}
               </div>
             )}
           </div>
 
-          {/* TIA Profiles Column */}
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900">TIA Profiles</h2>
-              <Link href="/profiles/new">
-                <Button variant="primary" size="sm">
-                  +
-                </Button>
-              </Link>
-            </div>
-
-            {profilesError && (
-              <Alert
-                type="error"
-                message={profilesError}
-                onClose={() => setProfilesError("")}
-                className="mb-6"
-              />
-            )}
-
-            {profilesLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <LoadingSpinner size="sm" />
-              </div>
-            ) : tiaProfiles.length === 0 ? (
-              <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
-                <svg
-                  className="w-8 h-8 text-gray-400 mx-auto mb-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-                <p className="text-sm text-gray-600 font-medium mb-3">
-                  No TIA profiles yet
-                </p>
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* TIA Profiles */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-foreground">TIA Profiles</h2>
                 <Link href="/profiles/new">
-                  <Button variant="primary" size="sm" fullWidth>
-                    Create Profile
+                  <Button variant="ghost" size="sm">
+                    <Plus className="h-4 w-4" />
                   </Button>
                 </Link>
               </div>
-            ) : (
-              <div className="space-y-3">
-                {tiaProfiles.map((profile) => (
-                  <Link
-                    key={profile.tia_profile_id}
-                    href={`/profiles/${profile.tia_profile_id}`}
-                  >
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md hover:border-indigo-200 transition cursor-pointer group">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition">
-                            {profile.name}
-                          </h3>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {profile.tone}
-                          </p>
+
+              {profilesError && (
+                <Alert
+                  type="error"
+                  message={profilesError}
+                  onClose={() => setProfilesError("")}
+                  className="mb-4"
+                />
+              )}
+
+              {profilesLoading ? (
+                <div className="card p-8 flex items-center justify-center">
+                  <LoadingSpinner size="sm" />
+                </div>
+              ) : tiaProfiles.length === 0 ? (
+                <EmptyState
+                  icon={<UserCog className="h-6 w-6 text-muted-foreground" />}
+                  title="No profiles yet"
+                  description="Create a TIA profile to customize your assistant"
+                  action={
+                    <Link href="/profiles/new">
+                      <Button variant="primary" size="sm">Create Profile</Button>
+                    </Link>
+                  }
+                />
+              ) : (
+                <div className="space-y-2">
+                  {tiaProfiles.slice(0, 4).map((profile) => (
+                    <Link
+                      key={profile.tia_profile_id}
+                      href={`/profiles/${profile.tia_profile_id}`}
+                    >
+                      <div className="card card-hover p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="min-w-0">
+                            <h3 className="font-medium text-foreground truncate">
+                              {profile.name}
+                            </h3>
+                            <p className="text-xs text-muted-foreground capitalize mt-0.5">
+                              {profile.tone}
+                            </p>
+                          </div>
+                          {profile.is_default && (
+                            <Badge variant="success">Default</Badge>
+                          )}
                         </div>
-                        {profile.is_default && (
-                          <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium whitespace-nowrap ml-2">
-                            Default
-                          </span>
-                        )}
                       </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Quick Links */}
-            <div className="mt-8">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">
-                Quick Links
-              </h3>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
               <div className="space-y-2">
                 <Link href="/conversations">
-                  <div className="px-4 py-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-200 hover:bg-indigo-50 transition text-sm font-medium text-gray-700 hover:text-indigo-600 flex items-center gap-2">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                      />
-                    </svg>
-                    Conversations
+                  <div className="card card-hover p-4 flex items-center gap-3">
+                    <div className="flex items-center justify-center w-9 h-9 bg-primary/10 rounded-lg">
+                      <MessageSquare className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Conversations</p>
+                      <p className="text-xs text-muted-foreground">Chat with TIA</p>
+                    </div>
                   </div>
                 </Link>
+
                 <Link href="/profiles">
-                  <div className="px-4 py-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-200 hover:bg-indigo-50 transition text-sm font-medium text-gray-700 hover:text-indigo-600 flex items-center gap-2">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
-                    All Profiles
+                  <div className="card card-hover p-4 flex items-center gap-3">
+                    <div className="flex items-center justify-center w-9 h-9 bg-violet-50 rounded-lg">
+                      <UserCog className="h-5 w-5 text-violet-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Manage Profiles</p>
+                      <p className="text-xs text-muted-foreground">Customize TIA</p>
+                    </div>
                   </div>
                 </Link>
               </div>
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </PageContainer>
+    </AppLayout>
   );
 }
